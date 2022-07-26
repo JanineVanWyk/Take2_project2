@@ -1,76 +1,208 @@
+// ************************************************
+// Shopping Cart API
+// ************************************************
 
-(function($){
+var shoppingCart = (function() {
+  // =============================
+  // Private methods and propeties
+  // =============================
+  cart = [];
   
-    $(document).ready(function() {
+  // Constructor
+  function Item(name, price, count) {
+    this.name = name;
+    this.price = price;
+    this.count = count;
+  }
   
-      // Initialize Isotope
-      var $container = $('.product-grid');
-      $container.isotope({
-        itemSelector: '.grid-product',
-        layoutMode: 'masonry'
-      });
+  // Save cart
+  function saveCart() {
+    sessionStorage.setItem('shoppingCart', JSON.stringify(cart));
+  }
+  
+    // Load cart
+  function loadCart() {
+    cart = JSON.parse(sessionStorage.getItem('shoppingCart'));
+  }
+  if (sessionStorage.getItem("shoppingCart") != null) {
+    loadCart();
+  }
   
 
+  // =============================
+  // Public methods and propeties
+  // =============================
+  var obj = {};
   
-      // Add to cart notification.
-      var $addToCart = $('.js-add-to-cart');
-      var performNotification = function() {
-        $('.your-cart').addClass('have-items');
-        $('.notifications').removeClass('fadeOut').addClass('fadeInLeft');
-        setTimeout( function(){
-          $('.notifications').removeClass('fadeInLeft').addClass('fadeOut');
-        }, 3000 );
-      };
-      $addToCart.on( 'click', performNotification );
-  
-      // Cart Slide Down
-      var $cartToggle = $('.js-toggle-cart');
-      var performCartToggle = function() {
-        $('.cart').toggleClass('show-cart');
-      };
-      $cartToggle.on( 'click', performCartToggle );
-      
-      /**
-       * Function for manipulating a sibling input of type "number"
-       * from an event fired. Relies on the control for increasing
-       * the number to have a class of .plus. Also requires a min
-       * attribute set on the number to know what not to go below.
-       */
-      var manipulateNumberInput = function(e) {
-        
-        e.preventDefault(); // Prevent default action.
-        
-        var $numberInput  = $(this).siblings('input[type=number]'),
-            currentValue  = $numberInput.val() != '' && $numberInput.val() || 1,
-            adjustedValue = parseInt( currentValue ) + ($(this).hasClass('plus') && 1 || -1);
-        
-        $numberInput.val( adjustedValue ).trigger('change'); // Adjust the number input value, trigger onChange.
-        
+  // Add to cart
+  obj.addItemToCart = function(name, price, count) {
+    for(var item in cart) {
+      if(cart[item].name === name) {
+        cart[item].count ++;
+        saveCart();
+        return;
       }
-      
-      /**
-       * Runs onchange to keep numbers between max/min values.
-       */
-      var validateNumberInput = function(e) {
-        
-        var $numberInput = $(this),
-            currentValue = parseInt( $numberInput.val() ),
-            minimumValue = parseInt( $(this).attr('min') ),
-            maximumValue = parseInt( $(this).attr('max') );
-        
-        if( currentValue < minimumValue ) $numberInput.val( minimumValue );
-        if( currentValue > maximumValue ) $numberInput.val( maximumValue );
-        
+    }
+    var item = new Item(name, price, count);
+    cart.push(item);
+    saveCart();
+  }
+  // Set count from item
+  obj.setCountForItem = function(name, count) {
+    for(var i in cart) {
+      if (cart[i].name === name) {
+        cart[i].count = count;
+        break;
       }
-      
-      // Find number controls, attach click events.
-      var $numberControls = $('.js-number-control');
-      $numberControls.on( 'click', manipulateNumberInput );
-      
-      // Attach validation listeners.
-      var $numberInputs = $('input[type=number]');
-      $numberInputs.on( 'change', validateNumberInput );
-  
-    }); // Document Ready
-  
-  })(jQuery); // Map jQuery => $
+    }
+  };
+  // Remove item from cart
+  obj.removeItemFromCart = function(name) {
+      for(var item in cart) {
+        if(cart[item].name === name) {
+          cart[item].count --;
+          if(cart[item].count === 0) {
+            cart.splice(item, 1);
+          }
+          break;
+        }
+    }
+    saveCart();
+  }
+
+  // Remove all items from cart
+  obj.removeItemFromCartAll = function(name) {
+    for(var item in cart) {
+      if(cart[item].name === name) {
+        cart.splice(item, 1);
+        break;
+      }
+    }
+    saveCart();
+  }
+
+  // Clear cart
+  obj.clearCart = function() {
+    cart = [];
+    saveCart();
+  }
+
+  // Count cart 
+  obj.totalCount = function() {
+    var totalCount = 0;
+    for(var item in cart) {
+      totalCount += cart[item].count;
+    }
+    return totalCount;
+  }
+
+  // Total cart
+  obj.totalCart = function() {
+    var totalCart = 0;
+    for(var item in cart) {
+      totalCart += cart[item].price * cart[item].count;
+    }
+    return Number(totalCart.toFixed(2));
+  }
+
+  // List cart
+  obj.listCart = function() {
+    var cartCopy = [];
+    for(i in cart) {
+      item = cart[i];
+      itemCopy = {};
+      for(p in item) {
+        itemCopy[p] = item[p];
+
+      }
+      itemCopy.total = Number(item.price * item.count).toFixed(2);
+      cartCopy.push(itemCopy)
+    }
+    return cartCopy;
+  }
+
+  // cart : Array
+  // Item : Object/Class
+  // addItemToCart : Function
+  // removeItemFromCart : Function
+  // removeItemFromCartAll : Function
+  // clearCart : Function
+  // countCart : Function
+  // totalCart : Function
+  // listCart : Function
+  // saveCart : Function
+  // loadCart : Function
+  return obj;
+})();
+
+
+// *****************************************
+// Triggers / Events
+// ***************************************** 
+// Add item
+$('.add-to-cart').click(function(event) {
+  event.preventDefault();
+  var name = $(this).data('name');
+  var price = Number($(this).data('price'));
+  shoppingCart.addItemToCart(name, price, 1);
+  displayCart();
+});
+
+// Clear items
+$('.clear-cart').click(function() {
+  shoppingCart.clearCart();
+  displayCart();
+});
+
+
+function displayCart() {
+  var cartArray = shoppingCart.listCart();
+  var output = "";
+  for(var i in cartArray) {
+    output += "<tr>"
+      + "<td>" + cartArray[i].name + "</td>" 
+      + "<td>(" + cartArray[i].price + ")</td>"
+      + "<td><div class='input-group'><button class='minus-item input-group-addon btn btn-primary' data-name=" + cartArray[i].name + ">-</button>"
+      + "<input type='number' class='item-count form-control' data-name='" + cartArray[i].name + "' value='" + cartArray[i].count + "'>"
+      + "<button class='plus-item btn btn-primary input-group-addon' data-name=" + cartArray[i].name + ">+</button></div></td>"
+      + "<td><button class='delete-item btn btn-danger' data-name=" + cartArray[i].name + ">X</button></td>"
+      + " = " 
+      + "<td>" + cartArray[i].total + "</td>" 
+      +  "</tr>";
+  }
+  $('.show-cart').html(output);
+  $('.total-cart').html(shoppingCart.totalCart());
+  $('.total-count').html(shoppingCart.totalCount());
+}
+
+// Delete item button
+
+$('.show-cart').on("click", ".delete-item", function(event) {
+  var name = $(this).data('name')
+  shoppingCart.removeItemFromCartAll(name);
+  displayCart();
+})
+
+
+// -1
+$('.show-cart').on("click", ".minus-item", function(event) {
+  var name = $(this).data('name')
+  shoppingCart.removeItemFromCart(name);
+  displayCart();
+})
+// +1
+$('.show-cart').on("click", ".plus-item", function(event) {
+  var name = $(this).data('name')
+  shoppingCart.addItemToCart(name);
+  displayCart();
+})
+
+// Item count input
+$('.show-cart').on("change", ".item-count", function(event) {
+   var name = $(this).data('name');
+   var count = Number($(this).val());
+  shoppingCart.setCountForItem(name, count);
+  displayCart();
+});
+
+displayCart();
