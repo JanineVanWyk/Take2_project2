@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;800&display=swap');
+
+* {
+    background-color: #fdf8f0;
+}
+
+.logo {
+    text-align: center;
+    display: inline-block;
+    float: none !important;
+    padding-left: 39%;
+}
+
+nav {
+    height: 30px;
+    padding-left: 535px;
+    padding-top: 10px;
+    background-color: rgb(78, 129, 48);
+}
+
+nav a {
+    padding: 100px;
+    text-decoration: none;
+    background-color:transparent;
+    color: #fdf8f0;
+    font-family: 'Red Hat Display', sans-serif;
+    font-weight:400;
+    letter-spacing: 4px;
+}
+
+.about {
+    height: 400px;
+    text-align: center;
+}
+
+.about h1 {
+    font-family: 'Red Hat Display', sans-serif;
+    font-weight: 800;
+    letter-spacing: 4px;
+}
+
+.about p {
+    font-family: 'Red Hat Display', sans-serif;
+    font-weight: 300;
+    letter-spacing: 4px;
+}
+
+.container {
+    max-width: 2000px;
+    margin: auto;
+    overflow: auto;
+    padding-left: 17%;
+}
+
+.gallery {
+    margin: 5px;
+    border: 5px solid rgb(78, 129, 48);
+    float:left;
+    position: center;
+    background-color: #fdf8f0;
+    width: 490px;
+}
+
+.gallery img {
+    width: 100%;
+    height: 500px;
+}
+
+.description {
+    padding: 10px;
+    background-color: white;
+    text-align: center;
+}
+
+.description h4 {
+    background-color: white;
+    font-family: 'Red Hat Display', sans-serif;
+    font-weight: 800;
+    letter-spacing: 4px;
+}
+
+.description p {
+    background-color: white;
+    font-family: 'Red Hat Display', sans-serif;
+    font-weight: 300;
+    letter-spacing: 4px;
+}
+
+.add-to-cart {
+    font-family: 'Red Hat Display', sans-serif;
+    font-weight: 300;
+    letter-spacing: 4px;
+    background-color: white;
+    color: black;
+    border: 1px solid rgb(78, 129, 48);
+}
+
+
+.contact {
+    height: 400px;
+    text-align: center;
+    font-family: 'Red Hat Display', sans-serif;
+    font-weight: 800;
+    letter-spacing: 4px;
+}
+
+footer {
+    height: 150px;
+    background-color: rgb(78, 129, 48);
+}
